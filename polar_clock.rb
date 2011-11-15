@@ -15,6 +15,7 @@ class PolarClock < Processing::App
     stroke_cap SQUARE
     smooth
     @count = 0
+    text_font load_font("HelveticaNeue-32.vlw")
   end
 
   def reset!
@@ -44,6 +45,9 @@ class PolarClock < Processing::App
     render_section @radius / 3.0,       h, 24, m, 60
     render_section @radius / 3.0 * 2.0, m, 60, s, 60
     render_section @radius,             s, 60, @count % @fps, @fps
+
+    t = "#{sprintf "%02d", h}h#{sprintf "%02d", m}m#{sprintf "%02d", s}s"
+    text(t, width - text_width(t) - 10, height - 10)
   end
 
   def stroke_color r
@@ -74,7 +78,7 @@ class PolarClock < Processing::App
     end
   end
 
-  def render_section r, s, max, other = 0, other_max = 1
+  def   render_section   r,   s,   max,   other   =    0,    other_max    =    1
     stroke_color r
     base_angle = -Math::PI / 2.0
 
@@ -83,7 +87,7 @@ class PolarClock < Processing::App
 
     stroke_weight @radius / 4.0
     no_fill
-    arc width/2.0, height/2.0, 2.0*r, 2.0*r, base_angle, angle + base_angle
+    arc width/2.0, height/2.0, 2.0*r,  2.0*r,  base_angle,  angle  +  base_angle
   end
 
 end

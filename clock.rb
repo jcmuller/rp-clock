@@ -36,7 +36,7 @@ class Clock < Processing::App
     render_sections hour % 12, minute, second
 
     if @s != second
-      @count = 0
+      @count = -1
       @s = second
     end
 
@@ -50,7 +50,7 @@ class Clock < Processing::App
     render_section @radius * 0.8, m, 60, s, 60
 
     stroke_weight 1
-    render_section @radius * 0.9, s, 60, @count % fps, fps
+    render_section @radius * 0.9, s, 60, @count, fps
   end
 
   def stroke_color r
