@@ -91,18 +91,18 @@ class PolarClock < Processing::App
     end
   end
 
-  def render_section  r, s, max, other = 0, other_max = 1
+  def render_section  r, t, max, other = 0, other_max = 1
     base_angle = -Math::PI / 2.0
     circ = 2.0 * Math::PI
     angle = 0
 
-    if s == 0
+    if t == 0
       angle = circ - easeInOutQuad(other.to_f, 0.0, circ - circ / max.to_f, other_max.to_f)
       alpha = 1 - easeInOutQuad(other.to_f, 0.0, 1.0, other_max.to_f)
       stroke r.to_f / @radius.to_f, 1, 0.75, alpha
     else
       a = easeInOutQuad(other.to_f, 0.0, other.to_f / other_max.to_f, other_max.to_f)
-      angle = (s.to_f / max.to_f) * circ + a * circ / max.to_f
+      angle = (t.to_f / max.to_f) * circ + a * circ / max.to_f
       stroke_color r
     end
 

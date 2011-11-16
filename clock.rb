@@ -11,14 +11,12 @@ class Clock < Processing::App
     @app_size = 150
     reset!
     #setting up a variable, since this is never exact
-    @fps = 60
+    @fps = 20
     frame_rate fps
     color_mode HSB, 1.0
     stroke_cap ROUND
     smooth
     @count = 0
-    @easings = get_easings
-    cycle_easing
   end
 
   def reset!
@@ -36,7 +34,7 @@ class Clock < Processing::App
     render_sections hour % 12, minute, second
 
     if @s != second
-      @count = -1
+      @count = 0
       @s = second
     end
 
@@ -47,10 +45,11 @@ class Clock < Processing::App
   def render_sections h, m, s
     stroke_weight 5
     render_section @radius * 3 / 5.0, h, 12, m, 60
-    render_section @radius * 0.8, m, 60, s, 60
+    render_section @radius * 0.8,     m, 60, s, 60
 
     stroke_weight 1
-    render_section @radius * 0.9, s, 60, @count, fps
+    render_section @radius * 0.9, s, 60, @count % @fps, @fps
+    #render_section @radius * 0.9, s, 60
   end
 
   def stroke_color r
@@ -77,46 +76,38 @@ class Clock < Processing::App
     (0...total).each do |value|
       alpha = 360.0 / total.to_f * value.to_f
       a = (90 - alpha).to_f * Math::PI / 180.0
-      x = width / 2.0 + r * Math.cos(a)
-      y = height / 2.0 - r * Math.sin(a)
 
-      x1 =  width / 2.0 + (r - size) * Math.cos(a)
+      x = width  / 2.0 + r * Math.cos(a)
+      y = height / 2.0 - r * Math.sin(a)
+      x1 = width  / 2.0 + (r - size) * Math.cos(a)
       y1 = height / 2.0 - (r - size) * Math.sin(a)
+
       line x1, y1, x, y
     end
   end
 
-  def render_section r, s, max, other = 0, other_max = 1
+  def render_section r, t, max, other = 0, other_max = 1
     stroke_color r
-    base_angle = -Math::PI / 2.0
 
-    a = easing(other.to_f, 0.0, other.to_f / other_max.to_f, other_max.to_f)
-    angle = (s.to_f / max.to_f) * Math::PI * 2.0 + a * 2.0 * Math::PI / max.to_f
-    #angle  = (s.to_f / max.to_f) * Math::PI * 2.0 + other.to_f / other_max.to_f * 2.0 * Math::PI / max.to_f
+    base_angle = -Math::PI / 2.0
+    circ       = 2.0 * Math::PI
+
+    a = easeInOutExpo(other.to_f, 0.0, other.to_f / other_max.to_f, other_max.to_f)
+    angle = (t.to_f / max.to_f) * circ + a * circ / max.to_f
+
+    # Linear
+    #angle  = circ * ((t.to_f / max.to_f) + (other.to_f / other_max.to_f / max.to_f))
 
     x = width/2.0
     y = height/2.0
-    x1 = x + r * Math.cos(angle + base_angle)
-    y1 = y + r * Math.sin(angle + base_angle)
+    x1 = x + r.to_f * Math.cos((angle + base_angle).to_f)
+    y1 = y + r.to_f * Math.sin((angle + base_angle).to_f)
 
     line x, y, x1, y1
   end
 
-  def easing *args
-    send @current_easing, *args
-  end
-
   def key_released
     case key
-    when CODED
-      case key_code
-      when UP
-        puts "UP"
-        cycle_easing
-      when DOWN
-        puts "DOWN"
-        cycle_easing_back
-      end
     when 'p'
       show_control_panel
     end
@@ -137,15 +128,4 @@ class Clock < Processing::App
     control_panel.display
   end
 
-  def cycle_easing
-    @current_easing = @easings.shift
-    @easings << @current_easing
-    puts "Current Easing: #{@current_easing}"
-  end
-
-  def cycle_easing_back
-    @easings.unshift(@current_easing)
-    @current_easing = @easings.pop
-    puts "Current Easing: #{@current_easing}"
-  end
 end
