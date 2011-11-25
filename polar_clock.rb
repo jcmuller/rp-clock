@@ -6,7 +6,7 @@ class PolarClock < Processing::App
   attr_accessor :app_size, :fps
 
   def setup
-    @app_size = 200
+    @app_size = 150
     reset!
 
     @fps = 30
